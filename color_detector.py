@@ -28,6 +28,8 @@ def recognize_color(R, G, B):
         if (val <= min):
             min = val
             color_name = colors.loc[i, 'color_name']
+
+    print('returning color name')
     
     return color_name
 
@@ -43,6 +45,7 @@ def mouse_click(event, x, y, flags, param):
         b = int(b)
         g = int(g)
         r = int(r)
+    print('clicked!')
 
 
 # open image file in a new window
@@ -64,6 +67,7 @@ while(1):
 
         # .putText params: image, text, start, font(0-7), fontScale, color, thickness, lineType
         cv2.putText(img, text, (50, 50), 2, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
+        print('text put')
 
         # for very light colors, display text in black
         if (r + g + b >= 600):
@@ -73,6 +77,7 @@ while(1):
 
 
     # close the application by breaking when user hits 'esc' key
+    # ^^^ that doesn't work, so just CTRL + C works for me
     if (cv2.waitKey(20) and 0xFF == 27):
         break
 
