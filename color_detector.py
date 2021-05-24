@@ -1,0 +1,79 @@
+import numpy as np
+import pandas as pd
+import cv2
+
+# define image
+img = cv2.imread('images/paint_strokes.jpeg')
+
+
+# color training on colors.csv
+index = ['color', 'color_name', 'hex', 'R', 'G', 'B']
+colors = pd.read_csv('data/colors.csv', names=index, header=None)
+
+
+# global variables
+clicked = False
+r = g = b = xpos = ypos = 0
+
+# called when double clicked on an area of the image
+# returns color name & RGB values of that color
+def recognize_color(R, G, B): 
+    min = 10000
+    for i in range(len(colors)):
+        # .loc() gets the column values
+        val = abs(R - int(colors.loc[i, 'R'])) 
+        + abs (G - int(colors.loc[i, 'G'])) 
+        + abs(B - int(colors.loc[i, 'B']))
+
+        if (val <= min):
+            min = val
+            color_name = colors.loc[i, 'color_name']
+    
+    return color_name
+
+
+# controls the double clicking 
+def mouse_click(event, x, y, flags, param):
+    if (event == cv2.EVENT_LBUTTONDBLCLK):
+        global r, g, b, xpos, ypos, clicked
+        clicked = True
+        xpos = x
+        ypos = y
+        b, g, r = img[y, x]
+        b = int(b)
+        g = int(g)
+        r = int(r)
+
+
+# open image file in a new window
+cv2.namedWindow('Color Recognition App')
+
+# call mouse click function
+cv2.setMouseCallback('Color Recognition App', mouse_click)
+
+# start the application window 
+while(1):
+    cv2.imshow('Color Recognition App', img)
+    if (clicked):
+        # .rectangle params: image, startpoint, endpoint, color, thickness) 
+        # -1 fills entire rectangle
+        cv2.rectangle(img, (20, 20), (750, 60), (b, g, r), -1)
+
+        # create text string to display (color name & rgb values)
+        text = recognize_color(r, g, b) + 'R = ' + str(r) + ', G = ' + str(g) + ' B = ' + str(b)
+
+        # .putText params: image, text, start, font(0-7), fontScale, color, thickness, lineType
+        cv2.putText(img, text, (50, 50), 2, 0.8, (255, 255, 255), 2, cv2.LINE_AA)
+
+        # for very light colors, display text in black
+        if (r + g + b >= 600):
+            cv2.putText(img, text, (50, 50), 2, 0.8, (0, 0, 0), 2, cv2.LINE_AA)
+
+        clicked = False
+
+
+    # close the application by breaking when user hits 'esc' key
+    if (cv2.waitKey(20) and 0xFF == 27):
+        break
+
+cv2.destroyAllWindows()
