@@ -1,8 +1,33 @@
 import numpy as np
 import cv2
 import imutils
+import pandas as pd
 
 cap = cv2.VideoCapture(0)
+
+
+def min_color(r, g, b):
+    """
+    :param r: R
+    :param g: G
+    :param b: B
+    :return: closest color from dataset
+    """
+    error = np.infty
+    idx = 0
+    for col in range(df.shape[0]):
+        red = df.loc[col, 'r']
+        gr = df.loc[col, 'g']
+        blue = df.loc[col, 'b']
+        r_e = (red - r) ** 2
+        g_e = (gr - g) ** 2
+        b_e = (blue - b) ** 2
+        total_e = r_e + g_e + b_e
+        if total_e < error:
+            idx = col
+            error = total_e
+    return df.loc[idx, 'formatted_name']
+
 
 while True:
     ret, frame = cap.read()
@@ -12,96 +37,58 @@ while True:
     # takes RGB pixel values to HSV values
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    lower_blue = np.array([90, 60, 0])
-    upper_blue = np.array([121, 255, 255])
+    df = pd.read_csv('colors.csv')
+    df.columns = ['name', 'formatted_name', 'hex', 'r', 'g', 'b']
+    color_bounds = dict()
+    """
+    for i in range(len(df)):
+        name = df.loc[i, 'formatted_name']
+        r = df.loc[i, 'r']
+        g = df.loc[i, 'g']
+        b = df.loc[i, 'b']
+        lower = np.array([max(0, r - 5), max(0, r - 5), max(0, r - 5)])
+        upper = np.array([min(255, r + 5), min(255, r + 5), min(255, r + 5)])
+        color_bounds[name] = np.array([lower, upper])
+    """
 
-    lower_yellow = np.array([25, 70, 120])
-    upper_yellow = np.array([30, 255, 255])
+    color_bounds["Blue"] = np.array([[90, 60, 0], [121, 255, 255]])
+    color_bounds["Yellow"] = np.array([[25, 70, 120], [30, 255, 255]])
+    color_bounds["Red"] = np.array([[0, 50, 120], [10, 255, 255]])
+    color_bounds["Green"] = np.array([[40, 70, 80], [130, 255, 255]])
 
-    lower_red = np.array([0, 50, 120])
-    upper_red = np.array([10, 255, 255])
+    colors = list(color_bounds.keys())
+    masks = list()
+    for color in colors:
+        mask = cv2.inRange(hsv, color_bounds[color][0, :], color_bounds[color][1, :])
+        masks.append(mask)
 
-    lower_green= np.array([40, 70, 80])
-    upper_green = np.array([130, 255, 255])
+    contours = list()
+    for mask in masks:
+        contour = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        contour = imutils.grab_contours(contour)
+        contours.append(contour)
 
-    # portion of an image and will only show the stuff in the range of the color
-    mask1 = cv2.inRange(hsv, lower_blue, upper_blue)
-    mask2 = cv2.inRange(hsv, lower_yellow, upper_yellow)
-    mask3 = cv2.inRange(hsv, lower_red, upper_red)
-    mask4 = cv2.inRange(hsv, lower_green, upper_green)
+    for i in range(len(contours)):
+        for c in contours[i]:
+            area = cv2.contourArea(c)
+            if area > 5000:
+                cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
+                M = cv2.moments(c)
 
-    # find the contours for each mask => useful for the shape analysis, object detection, & recognition
-    contour1 = cv2.findContours(mask1, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contour1 = imutils.grab_contours(contour1)
+                cx = int(M["m10"] / M["m00"])
+                cy = int(M["m01"] / M["m00"])
 
-    contour2 = cv2.findContours(mask2, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contour2 = imutils.grab_contours(contour2)
+                patch = np.zeros((100, 3))
+                for j in range(-5, 5):
+                    for k in range(-5, 5):
+                        indx = (j + 5) * 10 + (k + 5)
+                        patch[indx, :] = frame[cy + j, cx + k]
+                patch = np.average(patch, axis=0)
 
-    contour3 = cv2.findContours(mask3, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contour3 = imutils.grab_contours(contour3)
-
-    contour4 = cv2.findContours(mask4, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    contour4 = imutils.grab_contours(contour4)
-
-    # for each contour, find the area so that any other object will not be in the contour
-    # then draw, find the moment, and then label the color with a circle around
-    for c in contour1:
-        area1 = cv2.contourArea(c)
-        if area1 > 5000:
-            cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
-
-            M = cv2.moments(c)
-
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-
-            cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
-            cv2.putText(frame, "Blue", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
-
-    for c in contour2:
-        area1 = cv2.contourArea(c)
-        if area1 > 5000:
-            cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
-
-            M = cv2.moments(c)
-
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-
-            cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
-            cv2.putText(frame, "Yellow", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
-
-    for c in contour3:
-        area1 = cv2.contourArea(c)
-        if area1 > 5000:
-            cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
-
-            M = cv2.moments(c)
-
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-
-            cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
-            cv2.putText(frame, "Red", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
-
-    for c in contour4:
-        area1 = cv2.contourArea(c)
-        if area1 > 5000:
-            cv2.drawContours(frame, [c], -1, (0, 255, 0), 3)
-
-            M = cv2.moments(c)
-
-            cx = int(M["m10"] / M["m00"])
-            cy = int(M["m01"] / M["m00"])
-
-            cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
-            cv2.putText(frame, "Green", (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
-
-
-
-    # not blue, turn to black
-    # result = cv2.bitwise_and(frame, frame, mask=mask)
-
+                color = min_color(patch[0], patch[1], patch[2])
+                cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
+                # color = colors[i]
+                cv2.putText(frame, color, (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
 
     cv2.imshow('result', frame)
 
@@ -113,12 +100,13 @@ while True:
     if k == 27:
         break
 
-
 cap.release()
 cv2.destroyAllWindows()
-
 
 # get different colors
 # BGR_color = np.array([[[255, 0, 0]]])
 # x = cv2.cvtColor(BGR_color, cv2.COLOR_BGR2HSV)
 # x[0][0]
+
+
+
