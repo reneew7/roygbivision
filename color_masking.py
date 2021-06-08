@@ -1,34 +1,8 @@
 import numpy as np
 import cv2
 import imutils
-import pandas as pd
 
 cap = cv2.VideoCapture(0)
-
-
-def min_color(r, g, b):
-    """
-    :param r: R
-    :param g: G
-    :param b: B
-    :return: closest color from dataset
-    """
-    error = np.infty
-    idx = 0
-    for col in range(df.shape[0]):
-        red = df.loc[col, 'r']
-        gr = df.loc[col, 'g']
-        blue = df.loc[col, 'b']
-        r_e = (red - r) ** 2
-        g_e = (gr - g) ** 2
-        b_e = (blue - b) ** 2
-        total_e = r_e + g_e + b_e
-        if total_e < error:
-            idx = col
-            error = total_e
-    return df.loc[idx, 'formatted_name']
-
-
 while True:
     ret, frame = cap.read()
     width = int(cap.get(3))
@@ -36,25 +10,18 @@ while True:
 
     # takes RGB pixel values to HSV values
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-
-    df = pd.read_csv('colors.csv')
-    df.columns = ['name', 'formatted_name', 'hex', 'r', 'g', 'b']
     color_bounds = dict()
-    """
-    for i in range(len(df)):
-        name = df.loc[i, 'formatted_name']
-        r = df.loc[i, 'r']
-        g = df.loc[i, 'g']
-        b = df.loc[i, 'b']
-        lower = np.array([max(0, r - 5), max(0, r - 5), max(0, r - 5)])
-        upper = np.array([min(255, r + 5), min(255, r + 5), min(255, r + 5)])
-        color_bounds[name] = np.array([lower, upper])
-    """
 
-    color_bounds["Blue"] = np.array([[90, 60, 0], [121, 255, 255]])
-    color_bounds["Yellow"] = np.array([[25, 70, 120], [30, 255, 255]])
-    color_bounds["Red"] = np.array([[0, 50, 120], [10, 255, 255]])
-    color_bounds["Green"] = np.array([[40, 70, 80], [130, 255, 255]])
+    color_bounds["Red"] = np.array([[0, 60, 120], [10, 255, 255]])
+    color_bounds["Orange"] = np.array([[11, 60, 80], [25, 255, 255]])
+    color_bounds["Yellow"] = np.array([[26, 60, 120], [35, 255, 255]])
+    color_bounds["Green"] = np.array([[36, 60, 80], [70, 255, 255]])
+    color_bounds["Blue"] = np.array([[71, 60, 0], [120, 255, 255]])
+    color_bounds["Purple"] = np.array([[121, 60, 80], [1400, 255, 255]])
+    color_bounds["Pink"] = np.array([[141, 60, 80], [179, 255, 255]])
+    color_bounds["White"] = np.array([[0, 0, 200], [179, 60, 255]])
+    color_bounds["Black"] = np.array([[0, 0, 0], [179, 60, 50]])
+    color_bounds["Brown"] = np.array([[0, 0, 120], [10, 59, 119]])
 
     colors = list(color_bounds.keys())
     masks = list()
@@ -85,9 +52,9 @@ while True:
                         patch[indx, :] = frame[cy + j, cx + k]
                 patch = np.average(patch, axis=0)
 
-                color = min_color(patch[0], patch[1], patch[2])
+                # color = min_color(patch[0], patch[1], patch[2])
                 cv2.circle(frame, (cx, cy), 7, (255, 255, 255), -1)
-                # color = colors[i]
+                color = colors[i]
                 cv2.putText(frame, color, (cx - 20, cy - 20), cv2.FONT_HERSHEY_SIMPLEX, 2.5, (255, 255, 255), 3)
 
     cv2.imshow('result', frame)
