@@ -33,37 +33,42 @@ def min_color(r, g, b):
         if total_e < error:
             idx = col
             error = total_e
-    return df.loc[idx, 'formatted_name'], df.loc[idx, 'r'], df.loc[idx, 'g'], df.loc[idx, 'b']
+    return df.loc[idx, 'formatted_name'], df.loc[idx, 'r'], df.loc[idx, 'g'], df.loc[idx, 'b'], df.loc[idx, 'hex']
 
 
-# Load img
-image = cv2.imread('suz.jpeg')
-image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-img = image.reshape((-1, 3))
-img = np.float32(img)
+def get_palette(imname, k, fname):
+    # Load image
+    image = cv2.imread(imname)
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    img = image.reshape((-1, 3))
+    img = np.float32(img)
 
-# max iter 100, accuracy 0.9
-criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.9)
-k = 7
-ret, labels, centers = cv2.kmeans(img, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    # max iter 100, accuracy 0.9
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.9)
+    ret, labels, centers = cv2.kmeans(img, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
-palette = []
-color_names = []
-for i in centers:
-    info = min_color(i[0], i[1], i[2])
-    palette.append(Line2D([0], [0], color=(info[1] / 255, info[2] / 255, info[3] / 255), lw=4))
-    color_names.append(info[0])
+    palette = []
+    color_names = []
+    for i in centers:
+        info = min_color(i[0], i[1], i[2])
+        palette.append(Line2D([0], [0], color=(info[1] / 255, info[2] / 255, info[3] / 255), lw=4))
+        name = info[0] + ' ' + info[4]
+        color_names.append(name)
 
-# convert data into 8-bit values
-centers = np.uint8(centers)
-segmented_data = centers[labels.flatten()]
-# reshape back into original image shape
-segmented_image = segmented_data.reshape(image.shape)
-fig, ax = plt.subplots()
-ax.legend(palette, color_names)
-plt.imshow(segmented_image)
-plt.show()
+    # convert data into 8-bit values
+    centers = np.uint8(centers)
+    segmented_data = centers[labels.flatten()]
+    # reshape back into original image shape
+    segmented_image = segmented_data.reshape(image.shape)
+    fig, ax = plt.subplots()
+    ax.legend(palette, color_names, bbox_to_anchor=(1, 1), loc="upper left")
+    plt.imshow(segmented_image)
+    plt.savefig(fname, bbox_inches='tight')
 
 
-
-# cv2.imwrite('test.jpeg', segmented_image)
+get_palette('suz.jpeg', 3, 'suzk3.jpeg')
+get_palette('suz.jpeg', 15, 'suzk15.jpeg')
+get_palette('farm.jpeg', 5, 'farm5.jpeg')
+get_palette('farm.jpeg', 15, 'farm15.jpeg')
+get_palette('cherryb.jpeg', 4, 'cherryb4.jpeg')
+get_palette('cherryb.jpeg', 15, 'cherryb15.jpeg')

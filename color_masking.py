@@ -17,7 +17,7 @@ while True:
     color_bounds["Yellow"] = np.array([[26, 60, 120], [35, 255, 255]])
     color_bounds["Green"] = np.array([[36, 60, 80], [70, 255, 255]])
     color_bounds["Blue"] = np.array([[71, 60, 0], [120, 255, 255]])
-    color_bounds["Purple"] = np.array([[121, 60, 80], [1400, 255, 255]])
+    color_bounds["Purple"] = np.array([[121, 60, 80], [140, 255, 255]])
     color_bounds["Pink"] = np.array([[141, 60, 80], [179, 255, 255]])
     color_bounds["White"] = np.array([[0, 0, 200], [179, 60, 255]])
     color_bounds["Black"] = np.array([[0, 0, 0], [179, 60, 50]])
@@ -59,9 +59,6 @@ while True:
 
     cv2.imshow('result', frame)
 
-    # if cv2.waitKey(1) == ord('q'):
-    #     break
-
     # wait for frame to refresh
     k = cv2.waitKey(5)
     if k == 27:
@@ -69,11 +66,6 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
-
-# get different colors
-# BGR_color = np.array([[[255, 0, 0]]])
-# x = cv2.cvtColor(BGR_color, cv2.COLOR_BGR2HSV)
-# x[0][0]
 
 
 
