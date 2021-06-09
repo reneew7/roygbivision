@@ -19,7 +19,15 @@
       </div>
 
       <div class="paragraph-card">
-        Enter text here. For writers, a random sentence can help them get their creative juices flowing. Since the topic of the sentence is completely unknown, it forces the writer to be creative when the sentence appears. There are a number of different ways a writer can use the random sentence for creativity.
+        <p> Our project focuses on two specific problems that arise because of the broad color spectrum that exists in our world. </p>
+
+        <p> Firstly, not everyone has the same ability to differentiate between colors. The first part of our project is a color detector that labels the colors found through the camera onto the screen. The detector will box out multiple targets (person, object, animal, etc.) and output its dominant identified color (red, orange, yellow, green, blue, purple, brown, white, brown, black). </p>
+
+        <p> Secondly, our project aims to help designers and other creators specify exact colors more easily, based on a photo. Given a photo and a palette size, this part of the project uses the k-means clustering algorithm to find the top k colors present in the photo. We then find the closest colors in our dataset to output color names and hex values. </p>
+
+        <p> We got our color dataset from <a href="https://www.kaggle.com/adityabhndari/color-detection-data-set?select=colors.csv">Kaggle</a> which gave us color names, RGB values, and hex codes for over 800 colors (Bhandari). </p>
+
+        <p> For this project, we applied topics like object detection, k-means clustering, and finding nearest neighbors using squared errors. We attempted other experiments like training a basic color (i.e. red, orange, yellow, etc.) detector using tensorflow, but we couldn’t find a useful application for the model in the scope of this project. Nevertheless, we hope that our project can help alleviate some of the challenges that arise with our world’s broad color spectrum. </p>
       </div>
     </div>
 
@@ -29,7 +37,18 @@
       </div>
 
       <div class="paragraph-card">
-        Enter text here. For writers, a random sentence can help them get their creative juices flowing. Since the topic of the sentence is completely unknown, it forces the writer to be creative when the sentence appears. There are a number of different ways a writer can use the random sentence for creativity.
+        <h4>Part 1 - Color Masking</h4>
+
+        <p> First, we retrieve rgb values from the video capture and then by masking we are able to convert to hsv and determine and define color bounds for the basic colors (red, orange, yellow, green, blue, purple, pink, white, black, and brown). Thus creating our colors.csv to be used later for the Color Detector. </p>
+
+        <p> One problem we ran into was that the camera was detecting the wrong colors, but only for a couple colors. It also thought a lot of objects were red. We solved this problem when we realized that OpenCV wanted the color ranges in HSV, where H has a max of 179 instead of 255. In other places, we also realized that it took RGB as BGR instead, which was why color detection was behaving weird. </p>
+
+        <p> One thing we tried was to use the dataset to create inRange bounds for the color detector. There were 800 colors, and this crashed the program, so we quickly moved on. </p>
+
+        <h4>Part 2 - Color Palette</h4>
+
+        <p> To get a palette, we used k-means clustering to get the top k colors in the image. Once we got the colors, we minimized the square errors between the RGB values in those colors and those in the dataset to get the closest colors for a palette. Initially, we also tried training a tensorflow model to do this. However, because each label was unique, we realized we didn’t really have a good dataset to evaluate our model on, since the model would always be evaluating a new color it’s never seen before. The only alternative way to evaluate accuracy would have been to test on training data, which we knew we shouldn’t do. Since we had no way to tell whether the tensor flow model was doing better than the minimization/nearest neighbor method, we just used the latter for our project. </p>
+
       </div>
     </div>
 
@@ -40,7 +59,7 @@
 
 
       <div class="paragraph-card">
-        Enter text here. For writers, a random sentence can help them get their creative juices flowing. Since the topic of the sentence is completely unknown, it forces the writer to be creative when the sentence appears. There are a number of different ways a writer can use the random sentence for creativity.
+        <p> Creating the color detector required lots of experimenting. The main experiment was to test out different ranges of colors. The classification of the color is based on a low and a high version of that color. For example, there is no one specific color of blue. We had to use an HSV color picker and try out different ranges of really light blues and really dark blues. Then, we would go into the webcam and try out objects that had different colors of blue. We would also compare it to other colors and make sure that it wasn't detecting blue on objects that were not that specified color. </p>
       </div>
     </div>
 
@@ -51,7 +70,63 @@
 
 
       <div class="paragraph-card">
-        Enter text here. For writers, a random sentence can help them get their creative juices flowing. Since the topic of the sentence is completely unknown, it forces the writer to be creative when the sentence appears. There are a number of different ways a writer can use the random sentence for creativity.
+        <h4>Part 1 - Color Masking</h4>
+
+        <p> The results for the color detector can be very dependent on lighting. If the lighting is poor, the webcam may not be able to pick up the colors as accurately as if the lighting was very good. It seems that natural lighting allows for more accurate results than artificial lighting. In addition, the detector basically highlights and finds anything that is in the webcam's view, rather than honing on one specific object. The only way to spotlight one thing is to make sure it is the only object in view of the webcam. Lastly, the program essentially has a range of certain colors, and classifies the object if it lies in that specific range. Therefore, it seems that there are some overlapping ranges and therefore, an "aqua" colored object would be classified as blue and green. </p>
+
+        <h4>Part 2 - Color Palette</h4>
+
+        <p> Talk about results </p>
+
+        <!-- Suzzallo Library Photos -->
+        <figure>
+          <figcaption>Suzzallo Library - Original</figcaption>
+          <img src="./suz.jpeg" alt="Suzzallo Library - Original">
+
+        </figure>
+
+        <figure>
+          <figcaption>Suzzallo Library - k-means where k = 3</figcaption>
+          <img src="./suzk3.jpeg" alt="Suzzallo Library - k-means where k = 3">
+        </figure>
+
+        <figure>
+          <figcaption>Suzzallo Library - k-means where k = 15</figcaption>
+          <img src="./suzk15.jpeg" alt="Suzzallo Library - k-means where k = 15">
+        </figure>
+
+        <!-- Cherry Blossoms Photos -->
+        <figure>
+          <figcaption>Cherry Blossoms - Original</figcaption>
+          <img src="./cherryb.jpeg" alt="Cherry Blossoms - Original">
+        </figure>
+
+        <figure>
+          <figcaption>Cherry Blossoms - k-means where k = 4</figcaption>
+          <img src="./cherryb4.jpeg" alt="Cherry Blossoms - k-means where k = 4">
+        </figure>
+
+        <figure>
+          <figcaption>Cherry Blossoms - k-means where k = 15</figcaption>
+          <img src="./cherryb15.jpeg" alt="Cherry Blossoms - k-means where k = 15">
+        </figure>
+
+        <!-- Farm Photos -->
+        <figure>
+          <figcaption>Farm - Original</figcaption>
+          <img src="./farm.jpeg" alt="Farm - Original">
+        </figure>
+
+        <figure>
+          <figcaption>Farm - k-means where k = 5</figcaption>
+          <img src="./farm5.jpeg" alt="Farm - k-means where k = 5">
+        </figure>
+
+        <figure>
+          <figcaption>Farm - k-means where k = 15</figcaption>
+          <img src="./farm15.jpeg" alt="Farm - k-means where k = 15">
+        </figure>
+
       </div>
     </div>
 
@@ -61,7 +136,29 @@
       </div>
 
       <div class="paragraph-card">
-        Enter text here. For writers, a random sentence can help them get their creative juices flowing. Since the topic of the sentence is completely unknown, it forces the writer to be creative when the sentence appears. There are a number of different ways a writer can use the random sentence for creativity.
+        <h4>Project Issues & Challenges</h4>
+
+        <p> Initially, the biggest challenge was getting OpenCV to work. Opening the camera and showing different results on it was pretty difficult. Next big issue was figuring out how to identify the colors and have that be represented in real-time. We realized that we wanted to try and find different color ranges and create a mask. Initially, all that was happening was in the webcam, it was showing only the desired color and everything else was black. </p>
+
+        <p> To fix this issue, we then needed to identify the contours -- which are lines that essentially create a boundary around the image. This way, we could create masks and contours and only identify that area, while still keeping the preserved coloring for what the webcam was capturing. After getting the desired object identified, it was pretty easy to find the moments to get the center of the object, so we could put the text representing the color there. </p>
+
+        <p> An issue that we're still having is overlapping ranges of colors and so when an object can be classified as multiple colors, the texts of all the color labels overlap it and make it hard to read. If there were more time, we would try to narrow down our colors and color ranges. </p>
+
+        <h4>Future work</h4>
+
+        <p> Initially as a team we were motivated by creating a feature that users would find fun and fascinating. However, moving forward this project could be used to support a larger project such as within accessibility screen readers that could help better label and define elements for users with vision impairment. </p>
+      </div>
+    </div>
+
+    <div class="body-card" id="footer">
+      <div class="inner-card">
+        <h2>References (APA7 format)</h2>
+      </div>
+
+      <div class="paragraph-card" style="width:50%;">
+        <p class="reference">Bhandari, A. (2020, August 12). <em>Color Detection Data Set</em>. Kaggle. <a href="https://www.kaggle.com/adityabhndari/color-detection-data-set?select=colors.csv">https://www.kaggle.com/adityabhndari/color-detection-data-set?select=colors.csv</a>.</p>
+        <p class="reference">Chavan, A. (2020, September 21). <em>Building RGB Color Classifier: Part 1</em>. Medium. <a href="https://medium.com/analytics-vidhya/building-rgb-color-classifier-part-1-af58e3bcfef7">https://medium.com/analytics-vidhya/building-rgb-color-classifier-part-1-af58e3bcfef7</a>.</p>
+        <p class="reference">Hassan, A. (2020, November 17). <em>K-Means Clustering for Image Segmentation using OpenCV in Python</em>. Medium. <a href="https://medium.com/towardssingularity/k-means-clustering-for-image-segmentation-using-opencv-in-python-17178ce3d6f3#:~:text=CV2.KMEANS%20Return%20Value%20compactness%20%3A%20It%20is%20the,%3A%20This%20is%20array%20of%20centers%20of%20clusters">https://medium.com/towardssingularity/k-means-clustering-for-image-segmentation-using-opencv-in-python-17178ce3d6f3#:~:text=CV2.KMEANS%20Return%20Value%20compactness%20%3A%20It%20is%20the,%3A%20This%20is%20array%20of%20centers%20of%20clusters</a>.</p>
       </div>
     </div>
 
