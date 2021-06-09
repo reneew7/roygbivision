@@ -13,6 +13,7 @@
   margin: auto;
   background-color: white;
   text-align: center;
+  padding-bottom: 2%;
 }
 
 .inner-card {
@@ -59,6 +60,10 @@ a {
   background: -o-linear-gradient(right, red, orange , yellow, green, blue, indigo, violet);
   background: -moz-linear-gradient(right, red, orange , yellow, green, blue, indigo, violet);
   background: linear-gradient(to right, red, orange , yellow, green, blue, indigo, violet);
+}
+
+#video {
+  border: none;
 }
 
 #first {

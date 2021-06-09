@@ -10,7 +10,12 @@
       <div class="header-inner-card">
         <h1>CSE 455 Final Project - roygbivision</h1>
         <h3>By Anne Pham, Renee Wang, Jyoti Lama, & Ethan Chen</h3>
+        <a href="https://github.com/reneew7/roygbivision">Click me to check out our source code!</a>
       </div>
+    </div>
+
+    <div class="body-card" id="video">
+      <iframe width="650" height="365" src="https://www.youtube.com/embed/lcpfzA1uAo4" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
 
     <div class="body-card" id="first">
@@ -48,7 +53,6 @@
         <h4>Part 2 - Color Palette</h4>
 
         <p> To get a palette, we used k-means clustering to get the top k colors in the image. Once we got the colors, we minimized the square errors between the RGB values in those colors and those in the dataset to get the closest colors for a palette. Initially, we also tried training a tensorflow model to do this. However, because each label was unique, we realized we didn’t really have a good dataset to evaluate our model on, since the model would always be evaluating a new color it’s never seen before. The only alternative way to evaluate accuracy would have been to test on training data, which we knew we shouldn’t do. Since we had no way to tell whether the tensor flow model was doing better than the minimization/nearest neighbor method, we just used the latter for our project. </p>
-
       </div>
     </div>
 
@@ -57,9 +61,10 @@
         <h2>Experiments</h2>
       </div>
 
-
       <div class="paragraph-card">
         <p> Creating the color detector required lots of experimenting. The main experiment was to test out different ranges of colors. The classification of the color is based on a low and a high version of that color. For example, there is no one specific color of blue. We had to use an HSV color picker and try out different ranges of really light blues and really dark blues. Then, we would go into the webcam and try out objects that had different colors of blue. We would also compare it to other colors and make sure that it wasn't detecting blue on objects that were not that specified color. </p>
+
+        <p> We spent a little time playing around with the iterations/accuracy on the k-means clustering, but 0.9 accuracy and/or 100 iterations seemed to give good results, so we used those values. Once we got the colors from the k-means clustering, we had to find the nearest color from the dataset. We tried experimenting with a tensorflow model first, but we didn’t have good training data for this particular situation because every color label was unique. Because of that, we stuck with minimizing the squared error between RGB values. </p>
       </div>
     </div>
 
@@ -68,7 +73,6 @@
         <h2>Results</h2>
       </div>
 
-
       <div class="paragraph-card">
         <h4>Part 1 - Color Masking</h4>
 
@@ -76,13 +80,12 @@
 
         <h4>Part 2 - Color Palette</h4>
 
-        <p> Talk about results </p>
+        <p> The results from our palette creator seem to be pretty accurate. While we can’t really tell the exact colors from the original image, we can see that the colors in the palettes seem pretty reasonably similar to the original. In particular, when we raised k to be big (ex. 15), the image looks really similar to the original, a good sign that the colors we are getting are accurate. Below are a couple examples of photos that we generated palettes on, both with a smaller k value and a larger k value. </p>
 
         <!-- Suzzallo Library Photos -->
         <figure>
           <figcaption>Suzzallo Library - Original</figcaption>
           <img src="./suz.jpeg" alt="Suzzallo Library - Original">
-
         </figure>
 
         <figure>
@@ -126,7 +129,6 @@
           <figcaption>Farm - k-means where k = 15</figcaption>
           <img src="./farm15.jpeg" alt="Farm - k-means where k = 15">
         </figure>
-
       </div>
     </div>
 
@@ -144,9 +146,13 @@
 
         <p> An issue that we're still having is overlapping ranges of colors and so when an object can be classified as multiple colors, the texts of all the color labels overlap it and make it hard to read. If there were more time, we would try to narrow down our colors and color ranges. </p>
 
+        <p> With the palette generator, there was a learning curve understanding how to do the k means clustering, and then displaying the picture. In particular, it took us a while to realize we had to convert our numpy array to 32 bit floats for everything to work properly. </p>
+
+        <p> When we tried to train a neural network for our color detection, our main issue was that the labels we had for color identification were unique to different RGB combinations. As a result, we couldn’t really evaluate correctness, so we had to come up with a different method of minimizing squared error instead. </p>
+
         <h4>Future work</h4>
 
-        <p> Initially as a team we were motivated by creating a feature that users would find fun and fascinating. However, moving forward this project could be used to support a larger project such as within accessibility screen readers that could help better label and define elements for users with vision impairment. </p>
+        <p> Initially as a team we were motivated by creating a feature that users would find fun and fascinating. However, moving forward this project could be used to support a larger project such as within accessibility screen readers that could help better label and define elements for users with vision impairment. Additionally, if we had some more time it would have been interesting to create a web app that generated palettes from user-uploaded photos. </p>
       </div>
     </div>
 
@@ -161,6 +167,5 @@
         <p class="reference">Hassan, A. (2020, November 17). <em>K-Means Clustering for Image Segmentation using OpenCV in Python</em>. Medium. <a href="https://medium.com/towardssingularity/k-means-clustering-for-image-segmentation-using-opencv-in-python-17178ce3d6f3#:~:text=CV2.KMEANS%20Return%20Value%20compactness%20%3A%20It%20is%20the,%3A%20This%20is%20array%20of%20centers%20of%20clusters">https://medium.com/towardssingularity/k-means-clustering-for-image-segmentation-using-opencv-in-python-17178ce3d6f3#:~:text=CV2.KMEANS%20Return%20Value%20compactness%20%3A%20It%20is%20the,%3A%20This%20is%20array%20of%20centers%20of%20clusters</a>.</p>
       </div>
     </div>
-
   </body>
 </html>
